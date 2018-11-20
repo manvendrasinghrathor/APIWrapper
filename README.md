@@ -1,2 +1,2 @@
 # APIWrapper
-API Wrapper using Alamofire 
+API Wrapper using Alamofire
