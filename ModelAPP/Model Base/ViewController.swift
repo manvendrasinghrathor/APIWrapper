@@ -8,7 +8,7 @@
 
 import UIKit
 class ViewController: UIViewController {
-    var models : [String] = []
+    var models: [String] = []
     @IBOutlet weak var modelTableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,16 +16,16 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
     }
     /// This function assign all the define models in array
-    func assignModelArray(){
+    func assignModelArray() {
         models.append(ModelsArray.wrapper)
     }
 }
-extension ViewController : UITableViewDelegate,UITableViewDataSource {
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return models.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let defaultcell : UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "modelCell") ?? UITableViewCell()
+        let defaultcell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "modelCell") ?? UITableViewCell()
         let label = defaultcell.viewWithTag(1) as? UILabel
         label?.text = models[indexPath.row]
         defaultcell.selectionStyle = .none
@@ -34,9 +34,8 @@ extension ViewController : UITableViewDelegate,UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch  models[indexPath.row] {
         case ModelsArray.wrapper:
-            let vc: RequestTypeViewController =  self.controllerForClass("RequestTypeViewController",storyboard: "APIWraper") as! RequestTypeViewController
-            self.navigationController?.pushViewController(vc, animated: true)
-            break
+            let viewContlr = self.controllerForClass("RequestTypeViewController", storyboard: "APIWraper") as? RequestTypeViewController
+            self.navigationController?.pushViewController(viewContlr ?? RequestTypeViewController(), animated: true)
         default:
             print("Thank You")
         }
@@ -46,8 +45,8 @@ extension ViewController : UITableViewDelegate,UITableViewDataSource {
     }
 }
 extension ViewController {
-    func controllerForClass(_ name: String, storyboard stroryBoard:String) -> UIViewController {
-        let viewController:UIViewController = UIStoryboard(name: stroryBoard as String, bundle: nil).instantiateViewController(withIdentifier: name as String) as UIViewController
+    func controllerForClass(_ name: String, storyboard stroryBoard: String) -> UIViewController {
+        let viewController = UIStoryboard(name: stroryBoard as String, bundle: nil).instantiateViewController(withIdentifier: name as String) as UIViewController
         return viewController
     }
 }

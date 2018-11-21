@@ -24,10 +24,10 @@ struct ResponseCode {
 
 /// The developer can modify this Model according to their requirement
 public struct APIWrapperGlobalFunctions {
-    static let KnownErrorCodes : [Int : String] = [ResponseCode.kUnauthorised : ErrorMessage.kSessionExpired]
-    static let kErrorMessageKey = ["msg","message"]
+    static let KnownErrorCodes: [Int: String] = [ResponseCode.kUnauthorised: ErrorMessage.kSessionExpired]
+    static let kErrorMessageKey = ["msg", "message"]
     /// It's a custome function, To handle the Unauthorised access
-   static func handleUnauthorisedAccess(){
+   static func handleUnauthorisedAccess() {
         print("LOGOUT handler call")
     }
     /// This function return the data from Imgae
@@ -36,8 +36,7 @@ public struct APIWrapperGlobalFunctions {
     ///   - image: Input Image
     ///   - compressionQuality: compression quality
     /// - Returns: data of that image
-    static func dataFromImage(image : UIImage , compressionQuality : Float) -> Data? {
+    static func dataFromImage(image: UIImage, compressionQuality: Float) -> Data? {
         return image.jpegData(compressionQuality: CGFloat(compressionQuality))
     }
 }
-

@@ -12,8 +12,8 @@ import SystemConfiguration
 /// To request API devop creat object of this wrapper, Init the object with APIRequestModel
 /// Developer can on the API debug mode by isDebugOn = true , default it's Off
 struct APIWrapper {
-    var isDebugOn : Bool = false
-    var requestModel : APIRequestModel = APIRequestModel(url: "")
+    var isDebugOn: Bool = false
+    var requestModel: APIRequestModel = APIRequestModel(url: "")
     init(request: APIRequestModel) {
         self.requestModel = request
     }
@@ -22,7 +22,7 @@ struct APIWrapper {
     /// - Parameters:
     ///   - success: This block will call when API has a response. developer can fetch the response directly from object
     ///   - failed: This block will call when there is an error while getting the response. The error is a collection of String, there is at least one error present in that Array
-    func requestAPI(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void){
+    func requestAPI(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
         // Check for Network connection
         if !self.isNetworkConnected() {
              failed([ErrorMessage.KNoNetwork])
@@ -71,7 +71,7 @@ struct APIWrapper {
             return
         }
         let urlString = requestModel.url
-        let url = URL.init(string:urlString)
+        let url = URL.init(string: urlString)
         let destination: DownloadRequest.DownloadFileDestination = { _, _ in
             var documentsURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             documentsURL.appendPathComponent(url?.lastPathComponent ?? "")
@@ -98,8 +98,8 @@ extension APIWrapper {
     /// - Parameters:
     ///   - success: When there is valid data response
     ///   - failed: failed if any error occur
-    private func request(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void){
-        Alamofire.request(requestModel.url, method: requestModel.type, parameters: requestModel.Parameters?.parameters ?? [:], encoding: requestModel.encoding, headers: requestModel.headers).responseJSON { (response) -> Void in
+    private func request(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
+        Alamofire.request(requestModel.url, method: requestModel.type, parameters: requestModel.parameters?.parameters ?? [:], encoding: requestModel.encoding, headers: requestModel.headers).responseJSON { (response) -> Void in
             self.handleResponse(response: response, success: { (responseValue) in
                 success(responseValue)
             }, failed: { (error) in
@@ -113,13 +113,13 @@ extension APIWrapper {
     ///   - progressValue: this call back return thr % of data uploaded
     ///   - success: When there is valid data response
     ///   - failed: failed if any error occur
-    private func upload(progressValue:@escaping(Double) -> Void,success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void){
+    private func upload(progressValue:@escaping(Double) -> Void, success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
         if !self.checkInputDataFiles() {
             failed([ErrorMessage.kSomethingWentWrong])
             self.debugPrint(object: ErrorMessage.kUnKnownRequest as AnyObject)
             return
         }
-        guard let url = URL(string:requestModel.url) else {
+        guard let url = URL(string: requestModel.url) else {
             failed([ErrorMessage.kSomethingWentWrong])
             self.debugPrint(object: ErrorMessage.kUnKnownRequest as AnyObject)
             return
@@ -134,7 +134,7 @@ extension APIWrapper {
                     multipartformData.append(muliPart.uploadFile, withName: muliPart.fileName, fileName: muliPart.serverKey, mimeType: muliPart.mimeTypes)
                 }
                 // add Parameters in multipartdata
-                if let parametersDict = self.requestModel.Parameters?.parameters {
+                if let parametersDict = self.requestModel.parameters?.parameters {
                     for (key, value) in parametersDict {
                         let newValue = "\(value as AnyObject)"
                         let valueData =  newValue.data(using: String.Encoding(rawValue: String.Encoding(rawValue: String.Encoding.utf8.rawValue).rawValue)) ?? Data()
@@ -156,10 +156,8 @@ extension APIWrapper {
                 case .failure(let error):
                 self.debugPrint(object: error as AnyObject)
                 failed([ErrorMessage.kSomethingWentWrong])
-                    break
                 }
-        }
-        )
+        })
     }
     /// This function check the input upload file count
     ///
@@ -169,40 +167,40 @@ extension APIWrapper {
         if minimumFileCount != 0 { // There is some file to upload
             if (requestModel.multiPartData?.fileNames?.count ?? 0) == 0 { // atlest one file name should be there
                 return false
-            }else if (requestModel.multiPartData?.serverKeys?.count ?? 0) == 0 { // atlest one server Keys should be there
+            } else if (requestModel.multiPartData?.serverKeys?.count ?? 0) == 0 { // atlest one server Keys should be there
                 return false
             } else if (requestModel.multiPartData?.mimeTypes?.count ?? 0) == 0 { // atlest one mime Types should be there
                 return false
-            }else {
+            } else {
                 return true // desired input
             }
-        }else {
-                return true // Nothing to upload
+        } else {
+            return true // Nothing to upload
         }
     }
     /// This function create multiform data using Input Model
     ///
     /// - Returns: final object of multipartFormData
     private func creatMultiformDataSet() -> [MultiPartFormData] {
-        var multipartData : [MultiPartFormData] = [MultiPartFormData]()
+        var multipartData: [MultiPartFormData] = [MultiPartFormData]()
         if let multipartformData = requestModel.multiPartData?.multipartformData {
             multipartData.append(contentsOf: multipartformData)
         }
         guard let uploadFile = requestModel.multiPartData?.uploadFile else {
             return multipartData
         }
-        for (index , file) in uploadFile.enumerated() {
-            var data : Data?
-            var fileName : String = self.getFileName(index: index)
+        for (index, file) in uploadFile.enumerated() {
+            var data: Data?
+            var fileName: String = self.getFileName(index: index)
             if file is UIImage {
-                let image = file as! UIImage
+                let image = file as? UIImage ?? UIImage()
                 if fileName == "" {
                   fileName = image.accessibilityIdentifier ?? ""
                 }
-                data = APIWrapperGlobalFunctions.dataFromImage(image: image, compressionQuality: requestModel.multiPartData?.ImageQuality ?? 0.1 )
-            }else if file is Data {
+                data = APIWrapperGlobalFunctions.dataFromImage(image: image, compressionQuality: requestModel.multiPartData?.imageQuality ?? 0.1 )
+            } else if file is Data {
                 data = file as? Data
-            }else if let fileUrl =  file as? String {
+            } else if let fileUrl =  file as? String {
                 let url = URL(fileURLWithPath: fileUrl)
                 if fileName == "" {
                     fileName = self.getFileName(file: url)
@@ -215,17 +213,17 @@ extension APIWrapper {
         }
         return multipartData
     }
-    func createMultipartObject (data : Data, index : Int, filename : String) -> MultiPartFormData {
+    func createMultipartObject (data: Data, index: Int, filename: String) -> MultiPartFormData {
         let key = self.getServerName(index: index)
         let mimeName = self.getMimeType(index: index)
         return MultiPartFormData(uploadFile: data, fileName: filename, serverKey: key, mimeTypes: mimeName)
     }
-    func fetchDataFromFileUrl(fileUrl : URL) -> Data? {
+    func fetchDataFromFileUrl(fileUrl: URL) -> Data? {
         if let image    = UIImage(contentsOfFile: fileUrl.path) {
-            return APIWrapperGlobalFunctions.dataFromImage(image: image, compressionQuality: requestModel.multiPartData?.ImageQuality ?? 0.1 )
+            return APIWrapperGlobalFunctions.dataFromImage(image: image, compressionQuality: requestModel.multiPartData?.imageQuality ?? 0.1 )
         } else {
             do {
-                let filedata : Data  = try Data(contentsOf: fileUrl as URL)
+                let filedata: Data  = try Data(contentsOf: fileUrl as URL)
                return filedata
             } catch {
                 debugPrint(object: "Exception \(error.localizedDescription)" as AnyObject)
@@ -237,7 +235,7 @@ extension APIWrapper {
     ///
     /// - Parameter file: input file
     /// - Returns: file name
-    private func getFileName(file : URL?) -> String {
+    private func getFileName(file: URL?) -> String {
         return file?.absoluteURL.lastPathComponent ?? ""
     }
     /// This function return the Mime type from Mime array of object
@@ -245,7 +243,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - index: data set index
     /// - Returns: mime name
-    private func getMimeType(index : Int) -> String {
+    private func getMimeType(index: Int) -> String {
         let mimes =  self.requestModel.multiPartData?.mimeTypes ?? []
         if index < mimes.count && mimes[index] != "" {
             return mimes[index]
@@ -257,11 +255,11 @@ extension APIWrapper {
     /// - Parameters:
     ///   - index: data set index
     /// - Returns: name
-    private func getFileName(index : Int) -> String {
+    private func getFileName(index: Int) -> String {
         let serverKey = self.requestModel.multiPartData?.serverKeys ?? []
         if index < serverKey.count && serverKey[index] != "" {
             return serverKey[index]
-        }else {
+        } else {
         }
         return ""
     }
@@ -270,7 +268,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - index: data set index
     /// - Returns: name
-    private func getServerName(index : Int) -> String {
+    private func getServerName(index: Int) -> String {
         let serverKey = self.requestModel.multiPartData?.serverKeys ?? []
         if index < serverKey.count && serverKey[index] != "" {
             return serverKey[index]
@@ -309,7 +307,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - response: DataResponse from the API
     ///   - success: Success closer
-    private func handleSuccess(response : DataResponse<Any>,success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void){
+    private func handleSuccess(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping ([String]) -> Void){
         let responseCode = response.response?.statusCode ?? ResponseCode.kBadRequest
         if ResponseCode.kSuccessRequest.contains(responseCode) {
             success(response.result.value as AnyObject)
@@ -324,14 +322,14 @@ extension APIWrapper {
     /// - Parameters:
     ///   - response: DataResponse from the API
     ///   - failed: Error closer
-    private func handleErrror(responseData : DataResponse<Any>, failed:@escaping ([String]) -> Void) {
+    private func handleErrror(responseData: DataResponse<Any>, failed: @escaping ([String]) -> Void) {
         let statusCode = responseData.response?.statusCode ?? ResponseCode.kBadRequest
         var errorMessage = [ErrorMessage.kSomethingWentWrong]
         // Check For Logout
         if checkUnauthorisedAccess(errorCode: statusCode) {
             errorMessage = [ErrorMessage.kSessionExpired]
             APIWrapperGlobalFunctions.handleUnauthorisedAccess()
-        }else {
+        } else {
             ///  API request error
             if responseData.error != nil {
                 errorMessage = [self.createErrorForFailure(errorCode: statusCode)]
@@ -345,7 +343,7 @@ extension APIWrapper {
     ///
     /// - Parameter errorCode: API response code
     /// - Returns: true if Unauthorised access else false
-    private func checkUnauthorisedAccess(errorCode : Int) -> Bool {
+    private func checkUnauthorisedAccess(errorCode: Int) -> Bool {
         if (errorCode == ResponseCode.kUnauthorised) {
             return true
         } else {
@@ -356,10 +354,10 @@ extension APIWrapper {
     ///
     /// - Parameter responseData: API responseData
     /// - Returns: error Message
-    private  func createErrorForSuccess(responseData : DataResponse<Any>) -> [String] {
-        if let reponseValue = responseData.result.value as? [String : AnyObject] {
+    private  func createErrorForSuccess(responseData: DataResponse<Any>) -> [String] {
+        if let reponseValue = responseData.result.value as? [String: AnyObject] {
             return self.fetchErrorFromResponse(reponse: reponseValue)
-        }else {
+        } else {
             return [ErrorMessage.kSomethingWentWrong]
         }
     }
@@ -367,8 +365,8 @@ extension APIWrapper {
     ///
     /// - Parameter reponse: reponse body as [String : AnyObject]
     /// - Returns: Error String
-    private func fetchErrorFromResponse(reponse : [String : AnyObject] )  -> [String] {
-        var errorValue : AnyObject?
+    private func fetchErrorFromResponse(reponse: [String: AnyObject] )  -> [String] {
+        var errorValue: AnyObject?
         for messageKey in APIWrapperGlobalFunctions.kErrorMessageKey {
             if let error = reponse[messageKey] {
                 errorValue = error
@@ -381,21 +379,21 @@ extension APIWrapper {
         if error is String {
             return [error as? String ?? ErrorMessage.kSomethingWentWrong]
         } else {
-            return self.fetchErrorStringFromMulipleErrors(errorDic:error)
+            return self.fetchErrorStringFromMulipleErrors(errorDic: error)
         }
     }
     /// This function fetch single error message from multiple errors
     ///
     /// - Parameter errorDic: Error object
     /// - Returns: error Message
-    private func fetchErrorStringFromMulipleErrors(errorDic : AnyObject) -> [String] {
+    private func fetchErrorStringFromMulipleErrors(errorDic: AnyObject) -> [String] {
         if errorDic is NSDictionary {
-            let errorValueDict = (errorDic as! NSDictionary).allValues
+            let errorValueDict = (errorDic as? NSDictionary ?? NSDictionary()).allValues
             if errorValueDict.count != 0 {
                 return errorValueDict as? [String] ?? [ErrorMessage.kSomethingWentWrong]
             }
-        }else if errorDic is [String] {
-            if (errorDic as! [String]).count != 0 {
+        } else if errorDic is [String] {
+            if (errorDic as? [String] ??  [""]).count != 0 {
                 return (errorDic as? [String] ?? [ErrorMessage.kSomethingWentWrong])
             }
         }
@@ -405,7 +403,7 @@ extension APIWrapper {
     ///
     /// - Parameter errorCode: API error code
     /// - Returns: error Message
-    private func createErrorForFailure(errorCode : Int) -> String {
+    private func createErrorForFailure(errorCode: Int) -> String {
         let allKnownErrorCode =  APIWrapperGlobalFunctions.KnownErrorCodes.keys
         if allKnownErrorCode.contains(errorCode) {
             return  APIWrapperGlobalFunctions.KnownErrorCodes[errorCode] ?? ErrorMessage.kSomethingWentWrong
@@ -415,7 +413,7 @@ extension APIWrapper {
     /// This fucniton print the log if debuging mode is ON
     ///
     /// - Parameter object: print Object
-    private func debugPrint(object : AnyObject) {
+    private func debugPrint(object: AnyObject) {
         if self.isDebugOn {
             print(object)
         }

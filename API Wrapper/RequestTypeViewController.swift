@@ -7,27 +7,26 @@
 //
 
 import UIKit
-
-class RequestTypeViewController: UIViewController  {
-    var httpType : [String] = []
+class RequestTypeViewController: UIViewController {
+    var httpType: [String] = []
     @IBOutlet weak var apiTypeView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
         assignModelArray()
     }
     /// This function assign all the define RequestMethod in array
-    func assignModelArray(){
+    func assignModelArray() {
         httpType.append(RequestMethod.get.rawValue)
         httpType.append(RequestMethod.post.rawValue)
-        httpType.append(RequestMethod.Upload.rawValue)
+        httpType.append(RequestMethod.upload.rawValue)
     }
 }
-extension RequestTypeViewController : UITableViewDelegate,UITableViewDataSource {
+extension RequestTypeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return httpType.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let defaultcell : UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell()
+        let defaultcell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell()
         let label = defaultcell.viewWithTag(1) as? UILabel
         label?.text = httpType[indexPath.row]
         defaultcell.selectionStyle = .none
@@ -35,7 +34,7 @@ extension RequestTypeViewController : UITableViewDelegate,UITableViewDataSource 
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch httpType[indexPath.row] {
-        case RequestMethod.Upload.rawValue: break
+        case RequestMethod.upload.rawValue: break
         case RequestMethod.post.rawValue: APIWrapperTest.callPostAPI()
         default: APIWrapperTest.callGetAPI() }
     }
@@ -46,5 +45,5 @@ extension RequestTypeViewController : UITableViewDelegate,UITableViewDataSource 
 enum RequestMethod: String {
     case get     = "GET"
     case post    = "POST"
-    case Upload     = "Upload"
+    case upload     = "Upload"
 }

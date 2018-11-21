@@ -14,9 +14,9 @@ struct APIModels {
     ///
     /// - Parameter email: email id of user
     /// - Returns: Get API Model
-    static func GetAPIModel(email : String) -> APIRequestModel {
-        let param = APIParameter(parameters: ["user[email]" : email])
-        let getModel = APIRequestModel(url: "https://qa.allective.com/api/v2/verify_email?user[email]", type: .get, Parameters: param)
+    static func getAPIModel(email: String) -> APIRequestModel {
+        let param = APIParameter(parameters: ["user[email]": email])
+        let getModel = APIRequestModel(url: "https://qa.allective.com/api/v2/verify_email?user[email]", type: .get, parameters: param)
         return getModel
     }
     /// Post API Model
@@ -26,11 +26,11 @@ struct APIModels {
     ///   - email: email id of user
     ///   - password: password entered
     /// - Returns: Post API Model
-    static func PostAPIModel(deviceToken : String? = "", email : String,password : String) -> APIRequestModel {
-        let keys = ["user[device_token]","user[email]","user[code]"]
-        let values = [deviceToken ?? "",email,password]
+    static func postAPIModel(deviceToken: String? = "", email: String, password: String) -> APIRequestModel {
+        let keys = ["user[device_token]", "user[email]", "user[code]"]
+        let values = [deviceToken ?? "", email, password]
         let param = APIParameter(keys: keys, values: values)
-        let getModel = APIRequestModel(url: "https://staging.allective.com/api/v2/sessions", type: .post, Parameters: param)
+        let getModel = APIRequestModel(url: "https://staging.allective.com/api/v2/sessions", type: .post, parameters: param)
         return getModel
     }
 }
@@ -38,8 +38,8 @@ struct APIModels {
 struct APIWrapperTest {
     /// Tetsing function for get api
     static func callGetAPI() {
-        let model = APIModels.GetAPIModel(email: "d.mem1@yopmail.com")
-        var  apiWrapper : APIWrapper = APIWrapper(request: model)
+        let model = APIModels.getAPIModel(email: "d.mem1@yopmail.com")
+        var  apiWrapper: APIWrapper = APIWrapper(request: model)
         apiWrapper.isDebugOn = true
         apiWrapper.requestAPI(success: { (object) in
             print(object)
@@ -49,8 +49,8 @@ struct APIWrapperTest {
     }
     /// Tetsing function for post api
     static func callPostAPI() {
-        let model = APIModels.PostAPIModel(email: "d.mem1@yopmail.com", password: "1234")
-        var  apiWrapper : APIWrapper = APIWrapper(request: model)
+        let model = APIModels.postAPIModel(email: "d.mem1@yopmail.com", password: "1234")
+        var  apiWrapper: APIWrapper = APIWrapper(request: model)
         apiWrapper.isDebugOn = true
         apiWrapper.requestAPI(success: { (object) in
             print(object)
@@ -62,9 +62,9 @@ struct APIWrapperTest {
     static func callUploadAPI() {
         var requestModel = APIRequestModel(url: "https://qa.allective.com/api/v2/verify_email?user[email]", type: .get)
         let peramters = APIParameter(keys: ["user[email]"], values: ["d.mem1@yopmail.com"])
-        requestModel.Parameters = peramters
+        requestModel.parameters = peramters
         requestModel.multiPartData = APIMultiPartFormData()
-        var  apiWrapper : APIWrapper = APIWrapper(request: requestModel)
+        var  apiWrapper: APIWrapper = APIWrapper(request: requestModel)
         apiWrapper.isDebugOn = true
         apiWrapper.requestAPI(success: { (object) in
             print(object)
