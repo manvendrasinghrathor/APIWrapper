@@ -17,7 +17,10 @@ class ViewController: UIViewController {
     }
     /// This function assign all the define models in array
     func assignModelArray() {
-        models.append(ModelsArray.wrapper)
+        models.append(ModelsArray.APIWrapper)
+        models.append(ModelsArray.Accelerometer)
+        models.append(ModelsArray.Speedometer)
+        models.append(ModelsArray.CoreLocation)
     }
 }
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
@@ -33,9 +36,18 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch  models[indexPath.row] {
-        case ModelsArray.wrapper:
+        case ModelsArray.APIWrapper:
             let viewContlr = self.controllerForClass("RequestTypeViewController", storyboard: "APIWraper") as? RequestTypeViewController
             self.navigationController?.pushViewController(viewContlr ?? RequestTypeViewController(), animated: true)
+        case ModelsArray.Accelerometer:
+            let viewController: AccelerometerViewController = AccelerometerViewController()
+            self.navigationController?.pushViewController(viewController, animated: true)
+        case ModelsArray.Speedometer:
+            let viewController: SpeedometerViewController = SpeedometerViewController()
+            self.navigationController?.pushViewController(viewController, animated: true)
+        case ModelsArray.CoreLocation:
+            let viewController: CoreLocationViewController = CoreLocationViewController()
+            self.navigationController?.pushViewController(viewController, animated: true)
         default:
             print("Thank You")
         }
@@ -52,5 +64,8 @@ extension ViewController {
 }
 /// This Struct contains all the models
 struct ModelsArray {
-    static let wrapper = "API Wrapper"
+    static let APIWrapper = "API Wrapper"
+    static let Accelerometer = "Accelerometer"
+    static let Speedometer = "Speedometer"
+    static let CoreLocation = "CoreLocation"
 }

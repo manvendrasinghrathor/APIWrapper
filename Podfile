@@ -8,6 +8,7 @@ use_frameworks!
 inhibit_all_warnings!
 pod 'SwiftLint',:inhibit_warnings => true
 pod 'AlamofireImage',:inhibit_warnings => true
+pod 'SwiftLog', '~> 1.0.0',:inhibit_warnings => true
   # Pods for ModelAPP
 
 end
