@@ -27,10 +27,10 @@ struct APIModels {
     ///   - password: password entered
     /// - Returns: Post API Model
     static func postAPIModel(deviceToken: String? = "", email: String, password: String) -> APIRequestModel {
-        let keys = ["user[device_token]", "user[email]", "user[code]"]
-        let values = [deviceToken ?? "", email, password]
+        let keys = ["name", "email", "password","location", "bio", "profile_image", "device_token", "device_type"]
+        let values = [ "Rotation App","gfprotationapp@gmail.com","kiwi@2018","","","","ca4a3473c730a37c9b7172e09825df9a6269499f41d05c5962213fc785c133cb","iso"]
         let param = APIParameter(keys: keys, values: values)
-        let getModel = APIRequestModel(url: "https://staging.allective.com/api/v2/sessions", type: .post, parameters: param)
+        let getModel = APIRequestModel(url: "http://54.87.110.198/api/V1/auth/signup", type: .post, parameters: param,headers: ["accept": "application/json"])
         return getModel
     }
 }

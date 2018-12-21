@@ -1,0 +1,9 @@
+API Wrapper
+    Request API using Alamofire
+Installation
+    Instal pod <pod 'AlamofireImage',:inhibit_warnings => true>
+    Drag and Drop "Wrapper Module" folder in your project
+Usage
+
+Contributing
+    Kiwitech India Pvt. Ltd.

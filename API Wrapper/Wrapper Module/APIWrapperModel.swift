@@ -28,21 +28,35 @@ struct APIRequestModel {
     init(url: String) {
         self.url = url
     }
-    init(url: String, type: HTTPMethod? = HTTPMethod.get) {
+    init(url: String, type: HTTPMethod) {
         self.url = url
-        self.type = type ?? HTTPMethod.get
+        self.type = type
     }
-    init(url: String, type: HTTPMethod? = HTTPMethod.get, parameters: APIParameter) {
+    init(url: String, type: HTTPMethod, parameters: APIParameter) {
         self.url = url
-        self.type = type ?? HTTPMethod.get
+        self.type = type
         self.parameters = parameters
     }
-    init(url: String, type: HTTPMethod? = HTTPMethod.get, parameters: APIParameter? = nil, encoding: ParameterEncoding? = URLEncoding.default, headers: HTTPHeaders? = nil) {
+    init(url: String, type: HTTPMethod, parameters: APIParameter, encoding: ParameterEncoding) {
         self.url = url
-        self.type = type ?? HTTPMethod.get
+        self.type = type
         self.parameters = parameters
-        self.encoding = encoding ?? URLEncoding.default
+        self.encoding = encoding
+    }
+    init(url: String, type: HTTPMethod, parameters: APIParameter, encoding: ParameterEncoding, headers: HTTPHeaders) {
+        self.url = url
+        self.type = type
+        self.parameters = parameters
+        self.encoding = encoding
         self.headers = headers
+    }
+    init(url: String, type: HTTPMethod, parameters: APIParameter, encoding: ParameterEncoding, headers: HTTPHeaders, uploadFileUrls: [String], multiPartData: APIMultiPartFormData) {
+        self.url = url
+        self.type = type
+        self.parameters = parameters
+        self.encoding = encoding
+        self.headers = headers
+        self.multiPartData = multiPartData
     }
     init(url: String, type: HTTPMethod? = HTTPMethod.get, parameters: APIParameter? = nil, encoding: ParameterEncoding? = URLEncoding.default, headers: HTTPHeaders? = nil, uploadFileUrls: [String]? = nil, multiPartData: APIMultiPartFormData? = nil) {
         self.url = url
@@ -68,10 +82,10 @@ struct APIParameter {
     init(keys: [String], values: [Any]) {
         self.keys = keys
         self.values = values
+        self.createParam()
     }
     init(parameters: [String: Any]) {
         self.parameters = parameters
-        self.createParam()
     }
     /// This function generate key value for API request
     mutating func createParam() {

@@ -8,7 +8,6 @@
 
 import Foundation
 import Alamofire
-import SystemConfiguration
 /// To request API devop creat object of this wrapper, Init the object with APIRequestModel
 /// Developer can on the API debug mode by isDebugOn = true , default it's Off
 struct APIWrapper {
@@ -24,7 +23,7 @@ struct APIWrapper {
     ///   - failed: This block will call when there is an error while getting the response. The error is a collection of String, there is at least one error present in that Array
     func requestAPI(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
         // Check for Network connection
-        if !self.isNetworkConnected() {
+        if !APIWrapperGlobalFunctions.isNetworkConnected() {
              failed([ErrorMessage.KNoNetwork])
             return
         }
@@ -32,9 +31,9 @@ struct APIWrapper {
         // Call internal function fro API calling
         self.request(success: { (response) in
             success(response)
-        }) { (error) in
+        }, failed: { (error) in
             failed(error)
-        }
+        })
     }
     /// This function is used to Upload the files from
     ///
@@ -44,7 +43,7 @@ struct APIWrapper {
     ///   - failed: in case of any error this call back call with collection of error
     func requestAPI(progressValue:@escaping(Double) -> Void, success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
         // Check for Network connection
-        if !self.isNetworkConnected() {
+        if !APIWrapperGlobalFunctions.isNetworkConnected() {
             failed([ErrorMessage.KNoNetwork])
             return
         }
@@ -54,9 +53,9 @@ struct APIWrapper {
             progressValue(progress)
         }, success: { (response) in
             success(response)
-        }) { (error) in
+        }, failed: { (error) in
             failed(error)
-        }
+        })
     }
     /// This function is used to download the file from url
     ///
@@ -66,7 +65,7 @@ struct APIWrapper {
     ///   - failed: in case of any error this call back call with collection of error
     func downloadFiles(progressValue:@escaping(Double) -> Void, success:@escaping (URL) -> Void, failed:@escaping ([String]) -> Void) {
         // Check for Network connection
-        if !self.isNetworkConnected() {
+        if !APIWrapperGlobalFunctions.isNetworkConnected() {
             failed([ErrorMessage.KNoNetwork])
             return
         }
@@ -91,7 +90,7 @@ struct APIWrapper {
         }
     }
 }
-// MARK: - API Calling
+// MARK: - RequestAPI
 extension APIWrapper {
     /// This function call request API using Amlofire
     ///
@@ -99,7 +98,8 @@ extension APIWrapper {
     ///   - success: When there is valid data response
     ///   - failed: failed if any error occur
     private func request(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
-        Alamofire.request(requestModel.url, method: requestModel.type, parameters: requestModel.parameters?.parameters ?? [:], encoding: requestModel.encoding, headers: requestModel.headers).responseJSON { (response) -> Void in
+        let params = requestModel.parameters?.parameters ?? [:]
+        Alamofire.request(requestModel.url, method: requestModel.type, parameters: params, encoding: requestModel.encoding, headers: requestModel.headers).responseJSON { (response) -> Void in
             self.handleResponse(response: response, success: { (responseValue) in
                 success(responseValue)
             }, failed: { (error) in
@@ -107,6 +107,9 @@ extension APIWrapper {
             })
         }
     }
+}
+// MARK: - UploadAPI
+extension APIWrapper {
     /// This function call request API using Amlofire
     ///
     /// - Parameters:
@@ -147,6 +150,11 @@ extension APIWrapper {
                 switch encodingResult {
                 case .success(let upload, _, _):
                     upload.responseJSON { response in
+                        upload.uploadProgress { progress in
+                            let percentUpload: Double = Double(progress.completedUnitCount/progress.totalUnitCount)
+                            self.debugPrint(object: percentUpload as AnyObject)
+                            progressValue(percentUpload)
+                        }
                         self.handleResponse(response: response, success: { (responseValue) in
                             success(responseValue)
                         }, failed: { (error) in
@@ -154,8 +162,8 @@ extension APIWrapper {
                         })
                     }
                 case .failure(let error):
-                self.debugPrint(object: error as AnyObject)
-                failed([ErrorMessage.kSomethingWentWrong])
+                    self.debugPrint(object: error as AnyObject)
+                    failed([ErrorMessage.kSomethingWentWrong])
                 }
         })
     }
@@ -195,7 +203,7 @@ extension APIWrapper {
             if file is UIImage {
                 let image = file as? UIImage ?? UIImage()
                 if fileName == "" {
-                  fileName = image.accessibilityIdentifier ?? ""
+                    fileName = image.accessibilityIdentifier ?? ""
                 }
                 data = APIWrapperGlobalFunctions.dataFromImage(image: image, compressionQuality: requestModel.multiPartData?.imageQuality ?? 0.1 )
             } else if file is Data {
@@ -224,7 +232,7 @@ extension APIWrapper {
         } else {
             do {
                 let filedata: Data  = try Data(contentsOf: fileUrl as URL)
-               return filedata
+                return filedata
             } catch {
                 debugPrint(object: "Exception \(error.localizedDescription)" as AnyObject)
                 return nil
@@ -284,18 +292,17 @@ extension APIWrapper {
     ///   - response: API DataResponse
     ///   - success: Success closer
     ///   - failed: failed closer
-    private func handleResponse(response : DataResponse<Any>,success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
+    private func handleResponse(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping ([String]) -> Void) {
         debugPrint(object: "API Response for url => \(self.requestModel.url )" as AnyObject)
+        self.debugPrint(object: response as AnyObject)
         switch response.result {
-        case .success( _):
+        case .success:
             self.handleSuccess(response: response, success: { (responseValue) in
                 success(responseValue)
-                self.debugPrint(object: responseValue as AnyObject)
-            }) { (error) in
-                 self.debugPrint(object: error as AnyObject)
+            }, failed: { (error) in
                 failed(error)
-            }
-        case .failure( _):
+            })
+        case .failure:
             self.debugPrint(object: response.error as AnyObject)
             self.handleErrror(responseData: response, failed: { (error) in
                 failed(error)
@@ -307,7 +314,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - response: DataResponse from the API
     ///   - success: Success closer
-    private func handleSuccess(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping ([String]) -> Void){
+    private func handleSuccess(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping ([String]) -> Void) {
         let responseCode = response.response?.statusCode ?? ResponseCode.kBadRequest
         if ResponseCode.kSuccessRequest.contains(responseCode) {
             success(response.result.value as AnyObject)
@@ -327,7 +334,7 @@ extension APIWrapper {
         var errorMessage = [ErrorMessage.kSomethingWentWrong]
         // Check For Logout
         if checkUnauthorisedAccess(errorCode: statusCode) {
-            errorMessage = [ErrorMessage.kSessionExpired]
+            errorMessage = [ErrorMessage.kUnauthorised]
             APIWrapperGlobalFunctions.handleUnauthorisedAccess()
         } else {
             ///  API request error
@@ -344,7 +351,7 @@ extension APIWrapper {
     /// - Parameter errorCode: API response code
     /// - Returns: true if Unauthorised access else false
     private func checkUnauthorisedAccess(errorCode: Int) -> Bool {
-        if (errorCode == ResponseCode.kUnauthorised) {
+        if errorCode == ResponseCode.kUnauthorised {
             return true
         } else {
             return false
@@ -365,7 +372,7 @@ extension APIWrapper {
     ///
     /// - Parameter reponse: reponse body as [String : AnyObject]
     /// - Returns: Error String
-    private func fetchErrorFromResponse(reponse: [String: AnyObject] )  -> [String] {
+    private func fetchErrorFromResponse(reponse: [String: AnyObject]) -> [String] {
         var errorValue: AnyObject?
         for messageKey in APIWrapperGlobalFunctions.kErrorMessageKey {
             if let error = reponse[messageKey] {
@@ -376,7 +383,7 @@ extension APIWrapper {
         guard let error = errorValue else {
             return  [ErrorMessage.kSomethingWentWrong]
         }
-        if error is String {
+        if error is String && (error as? String) != ""{
             return [error as? String ?? ErrorMessage.kSomethingWentWrong]
         } else {
             return self.fetchErrorStringFromMulipleErrors(errorDic: error)
@@ -387,15 +394,30 @@ extension APIWrapper {
     /// - Parameter errorDic: Error object
     /// - Returns: error Message
     private func fetchErrorStringFromMulipleErrors(errorDic: AnyObject) -> [String] {
+        var finalErrors: [String]?
         if errorDic is NSDictionary {
-            let errorValueDict = (errorDic as? NSDictionary ?? NSDictionary()).allValues
-            if errorValueDict.count != 0 {
-                return errorValueDict as? [String] ?? [ErrorMessage.kSomethingWentWrong]
+            let errorValueArray = (errorDic as? NSDictionary ?? NSDictionary()).allValues
+            if errorValueArray.count != 0 {
+                if errorValueArray is [String] {
+                    finalErrors = errorValueArray as? [String]
+                } else {
+                    for items in errorValueArray {
+                        if items is [String] {
+                            if (items as? [String] ?? []).count != 0 && (items as? [String] ?? [])[0] != "" {
+                                finalErrors?.append((items as? [String] ?? [])[0])
+                            }
+                        }
+                    }
+                }
             }
         } else if errorDic is [String] {
             if (errorDic as? [String] ??  [""]).count != 0 {
-                return (errorDic as? [String] ?? [ErrorMessage.kSomethingWentWrong])
+                finalErrors  = errorDic as? [String]
             }
+        }
+        finalErrors = finalErrors?.filter { $0 != "" } // remove blank object
+        if finalErrors?.count != 0 {
+            return finalErrors ?? [ErrorMessage.kSomethingWentWrong]
         }
         return [ErrorMessage.kSomethingWentWrong]
     }
@@ -421,31 +443,9 @@ extension APIWrapper {
     /// This function print the request model
     private func printRequestModel() {
         debugPrint(object: "Request Model" as AnyObject)
-        debugPrint(object: requestModel as AnyObject)
-    }
-}
-// MARK: - Reachability
-extension APIWrapper {
-    /// This function check network connectivity
-    ///
-    /// - Returns: true if network is connected
-    func isNetworkConnected() -> Bool {
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                SCNetworkReachabilityCreateWithAddress(nil, $0)
-            }
-        }) else {
-            return false
-        }
-        var flags = SCNetworkReachabilityFlags()
-        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
-            return false
-        }
-        let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
-        let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
-        return (isReachable && !needsConnection)
+        debugPrint(object: "URL=> \(requestModel.url)" as AnyObject)
+        debugPrint(object: "TYPE=> \(requestModel.type)" as AnyObject)
+        debugPrint(object: "PARAMS=> \(String(describing: requestModel.parameters?.parameters))" as AnyObject)
+        debugPrint(object: "HEADER=> \(String(describing: requestModel.headers))" as AnyObject)
     }
 }
