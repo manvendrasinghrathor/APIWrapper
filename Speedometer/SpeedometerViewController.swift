@@ -10,10 +10,10 @@ import UIKit
 import CoreMotion
 
 class SpeedometerViewController: UIViewController {
-    @IBOutlet weak var steps: AnimatedLabel!
-    @IBOutlet weak var spped: AnimatedLabel!
-    @IBOutlet weak var avgSpeed: AnimatedLabel!
-    @IBOutlet weak var distance: AnimatedLabel!
+    @IBOutlet weak var steps: UILabel!
+    @IBOutlet weak var spped: UILabel!
+    @IBOutlet weak var avgSpeed: UILabel!
+    @IBOutlet weak var distance: UILabel!
     @IBOutlet weak var activityTypeLabel: UILabel!
     private let activityManager = CMMotionActivityManager()
     private let pedoMeter = CMPedometer()
