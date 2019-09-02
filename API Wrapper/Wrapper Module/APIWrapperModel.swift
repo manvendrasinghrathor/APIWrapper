@@ -157,3 +157,25 @@ struct MultiPartFormData {
         self.mimeTypes = mimeTypes
     }
 }
+struct ErrorResponse {
+    private var errorList: [String] = []
+    private var errorCode: Int = 500
+    private var errorObject: [String: AnyObject]?
+    init(errorList: [String], errorCode: Int, errorObject: [String: AnyObject]? = nil) {
+        self.errorList = errorList
+        self.errorCode = errorCode
+        self.errorObject = errorObject
+    }
+    func code() -> Int {
+        return errorCode
+    }
+    func error() -> String {
+        return errorList[0]
+    }
+    func errors() -> [String] {
+        return errorList
+    }
+    func object() -> [String: AnyObject]? {
+        return errorObject
+    }
+}

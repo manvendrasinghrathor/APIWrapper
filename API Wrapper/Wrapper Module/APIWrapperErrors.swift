@@ -76,4 +76,13 @@ public struct APIWrapperGlobalFunctions {
         let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
         return (isReachable && !needsConnection)
     }
+    static func noNetworkError() -> ErrorResponse {
+        return ErrorResponse(errorList: [ErrorMessage.KNoNetwork],
+                             errorCode: ResponseCode.kBadRequest)
+    }
+    static func internalServerError(_ error: String? = nil) -> ErrorResponse {
+        return ErrorResponse(errorList: [error ?? ErrorMessage.kSomethingWentWrong],
+                             errorCode: ResponseCode.InternalServerError)
+    }
 }
+

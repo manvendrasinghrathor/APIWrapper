@@ -21,10 +21,10 @@ struct APIWrapper {
     /// - Parameters:
     ///   - success: This block will call when API has a response. developer can fetch the response directly from object
     ///   - failed: This block will call when there is an error while getting the response. The error is a collection of String, there is at least one error present in that Array
-    func requestAPI(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
+    func requestAPI(success:@escaping (AnyObject) -> Void, failed:@escaping (ErrorResponse) -> Void) {
         // Check for Network connection
         if !APIWrapperGlobalFunctions.isNetworkConnected() {
-             failed([ErrorMessage.KNoNetwork])
+             failed(APIWrapperGlobalFunctions.noNetworkError())
             return
         }
         self.printRequestModel()
@@ -41,10 +41,10 @@ struct APIWrapper {
     ///   - progressValue: this call back return thr % of data uploaded
     ///   - success: success when uploading will finish
     ///   - failed: in case of any error this call back call with collection of error
-    func requestAPI(progressValue:@escaping(Double) -> Void, success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
+    func requestAPI(progressValue:@escaping(Double) -> Void, success:@escaping (AnyObject) -> Void, failed:@escaping (ErrorResponse) -> Void) {
         // Check for Network connection
         if !APIWrapperGlobalFunctions.isNetworkConnected() {
-            failed([ErrorMessage.KNoNetwork])
+            failed(APIWrapperGlobalFunctions.noNetworkError())
             return
         }
         self.printRequestModel()
@@ -63,10 +63,10 @@ struct APIWrapper {
     ///   - progressValue: this call back return thr % of data uploaded
     ///   - success: success when uploading will finish
     ///   - failed: in case of any error this call back call with collection of error
-    func downloadFiles(progressValue:@escaping(Double) -> Void, success:@escaping (URL) -> Void, failed:@escaping ([String]) -> Void) {
+    func downloadFiles(progressValue:@escaping(Double) -> Void, success:@escaping (URL) -> Void, failed:@escaping (ErrorResponse) -> Void) {
         // Check for Network connection
         if !APIWrapperGlobalFunctions.isNetworkConnected() {
-            failed([ErrorMessage.KNoNetwork])
+            failed(APIWrapperGlobalFunctions.noNetworkError())
             return
         }
         let urlString = requestModel.url
@@ -85,7 +85,8 @@ struct APIWrapper {
                 if let destinationUrl = response.destinationURL {
                     success(destinationUrl)
                 } else {
-                    failed([response.error?.localizedDescription ?? ErrorMessage.kSomethingWentWrong])
+                    failed(APIWrapperGlobalFunctions.internalServerError(
+                        response.error?.localizedDescription))
                 }
         }
     }
@@ -97,7 +98,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - success: When there is valid data response
     ///   - failed: failed if any error occur
-    private func request(success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
+    private func request(success:@escaping (AnyObject) -> Void, failed:@escaping (ErrorResponse) -> Void) {
         let params = requestModel.parameters?.parameters ?? [:]
         Alamofire.request(requestModel.url, method: requestModel.type, parameters: params, encoding: requestModel.encoding, headers: requestModel.headers).responseJSON { (response) -> Void in
             self.handleResponse(response: response, success: { (responseValue) in
@@ -116,14 +117,14 @@ extension APIWrapper {
     ///   - progressValue: this call back return thr % of data uploaded
     ///   - success: When there is valid data response
     ///   - failed: failed if any error occur
-    private func upload(progressValue:@escaping(Double) -> Void, success:@escaping (AnyObject) -> Void, failed:@escaping ([String]) -> Void) {
+    private func upload(progressValue:@escaping(Double) -> Void, success:@escaping (AnyObject) -> Void, failed:@escaping (ErrorResponse) -> Void) {
         if !self.checkInputDataFiles() {
-            failed([ErrorMessage.kSomethingWentWrong])
+            failed(APIWrapperGlobalFunctions.internalServerError())
             self.debugPrint(object: ErrorMessage.kUnKnownRequest as AnyObject)
             return
         }
         guard let url = URL(string: requestModel.url) else {
-            failed([ErrorMessage.kSomethingWentWrong])
+            failed(APIWrapperGlobalFunctions.internalServerError())
             self.debugPrint(object: ErrorMessage.kUnKnownRequest as AnyObject)
             return
         }
@@ -163,7 +164,7 @@ extension APIWrapper {
                     }
                 case .failure(let error):
                     self.debugPrint(object: error as AnyObject)
-                    failed([ErrorMessage.kSomethingWentWrong])
+                    failed(APIWrapperGlobalFunctions.internalServerError())
                 }
         })
     }
@@ -292,7 +293,7 @@ extension APIWrapper {
     ///   - response: API DataResponse
     ///   - success: Success closer
     ///   - failed: failed closer
-    private func handleResponse(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping ([String]) -> Void) {
+    private func handleResponse(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping (ErrorResponse) -> Void) {
         debugPrint(object: "API Response for url => \(self.requestModel.url )" as AnyObject)
         self.debugPrint(object: response as AnyObject)
         switch response.result {
@@ -314,7 +315,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - response: DataResponse from the API
     ///   - success: Success closer
-    private func handleSuccess(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping ([String]) -> Void) {
+    private func handleSuccess(response: DataResponse<Any>, success: @escaping (AnyObject) -> Void, failed: @escaping (ErrorResponse) -> Void) {
         let responseCode = response.response?.statusCode ?? ResponseCode.kBadRequest
         if ResponseCode.kSuccessRequest.contains(responseCode) {
             success(response.result.value as AnyObject)
@@ -329,7 +330,7 @@ extension APIWrapper {
     /// - Parameters:
     ///   - response: DataResponse from the API
     ///   - failed: Error closer
-    private func handleErrror(responseData: DataResponse<Any>, failed: @escaping ([String]) -> Void) {
+    private func handleErrror(responseData: DataResponse<Any>, failed: @escaping (ErrorResponse) -> Void) {
         let statusCode = responseData.response?.statusCode ?? ResponseCode.kBadRequest
         var errorMessage = [ErrorMessage.kSomethingWentWrong]
         // Check For Logout
@@ -344,7 +345,9 @@ extension APIWrapper {
                 errorMessage = self.createErrorForSuccess(responseData: responseData)
             }
         }
-        failed(errorMessage)
+        failed(ErrorResponse(
+            errorList: errorMessage, errorCode: statusCode,
+            errorObject: responseData.result.value as? [String: AnyObject]))
     }
     /// This function check the error code for Unauthorised access
     ///
