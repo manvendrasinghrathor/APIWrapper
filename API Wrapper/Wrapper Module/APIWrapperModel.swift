@@ -9,6 +9,15 @@
 import Foundation
 import Alamofire
 /// model used to request a API
+struct APICodable<T> {
+    private var model: T
+    init(_ model: T) {
+        self.model = model
+    }
+    func getModel() -> T {
+        return self.model
+    }
+}
 struct APIRequestModel {
     var url: String = ""
     var type: HTTPMethod = HTTPMethod.get
@@ -16,6 +25,7 @@ struct APIRequestModel {
     var encoding: ParameterEncoding = URLEncoding.default
     var headers: HTTPHeaders?
     var multiPartData: APIMultiPartFormData?
+    var codable: APICodable<Any>?
     /// In init function of APIRequestModel the API URL is compulsory object all other are optional
     /// To upload file, APIMultiPartFormData is required
     /// - parameters:
@@ -58,7 +68,13 @@ struct APIRequestModel {
         self.headers = headers
         self.multiPartData = multiPartData
     }
-    init(url: String, type: HTTPMethod? = HTTPMethod.get, parameters: APIParameter? = nil, encoding: ParameterEncoding? = URLEncoding.default, headers: HTTPHeaders? = nil, uploadFileUrls: [String]? = nil, multiPartData: APIMultiPartFormData? = nil) {
+    init(
+        url: String, type: HTTPMethod? = HTTPMethod.get,
+        parameters: APIParameter? = nil,
+        encoding: ParameterEncoding? = URLEncoding.default,
+        headers: HTTPHeaders? = nil,
+        uploadFileUrls: [String]? = nil,
+        multiPartData: APIMultiPartFormData? = nil) {
         self.url = url
         self.type = type ?? HTTPMethod.get
         self.parameters = parameters

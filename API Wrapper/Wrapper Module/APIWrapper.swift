@@ -404,12 +404,10 @@ extension APIWrapper {
                 if errorValueArray is [String] {
                     finalErrors = errorValueArray as? [String]
                 } else {
-                    for items in errorValueArray {
-                        if items is [String] {
+                    for items in errorValueArray where items is [String] {
                             if (items as? [String] ?? []).count != 0 && (items as? [String] ?? [])[0] != "" {
                                 finalErrors?.append((items as? [String] ?? [])[0])
                             }
-                        }
                     }
                 }
             }

@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     }
     /// This function assign all the define models in array
     func assignModelArray() {
+        models.append(ModelsArray.MVVM)
         models.append(ModelsArray.APIWrapper)
         models.append(ModelsArray.Accelerometer)
         models.append(ModelsArray.Speedometer)
@@ -47,6 +48,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             self.navigationController?.pushViewController(viewController, animated: true)
         case ModelsArray.CoreLocation:
             let viewController: CoreLocationViewController = CoreLocationViewController()
+            self.navigationController?.isNavigationBarHidden = false
+            self.navigationController?.pushViewController(viewController, animated: true)
+        case ModelsArray.MVVM:
+            let viewController: LoginController = LoginController()
             self.navigationController?.pushViewController(viewController, animated: true)
         default:
             print("Thank You")
@@ -64,6 +69,7 @@ extension ViewController {
 }
 /// This Struct contains all the models
 struct ModelsArray {
+    static let MVVM = "MVVM"
     static let APIWrapper = "API Wrapper"
     static let Accelerometer = "Accelerometer"
     static let Speedometer = "Speedometer"

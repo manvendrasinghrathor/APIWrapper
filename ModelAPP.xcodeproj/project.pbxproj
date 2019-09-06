@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		2393FE2BD32EEA09C5EF21CA /* Pods_ModelAPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 74A6EBF7F28FE70E7D81F11B /* Pods_ModelAPP.framework */; };
 		A080672821A3DBA8002B4BFB /* APIWrapperTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A080672721A3DBA8002B4BFB /* APIWrapperTest.swift */; };
+		D6067E32232137EC007FC65B /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6067E31232137EC007FC65B /* LoginModel.swift */; };
+		D6067E3423213810007FC65B /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6067E3323213810007FC65B /* LoginViewModel.swift */; };
+		D6067E3923213C3F007FC65B /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6067E3723213C3F007FC65B /* LoginController.swift */; };
+		D6067E3A23213C3F007FC65B /* LoginController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D6067E3823213C3F007FC65B /* LoginController.xib */; };
 		D6333A6B21A5759F00B05DB5 /* AccelerometerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6333A6921A5759F00B05DB5 /* AccelerometerViewController.swift */; };
 		D6333A6C21A5759F00B05DB5 /* AccelerometerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D6333A6A21A5759F00B05DB5 /* AccelerometerViewController.xib */; };
 		D6365F1C21AC03550010A5D3 /* CoreLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6365F1A21AC03550010A5D3 /* CoreLocationViewController.swift */; };
@@ -34,6 +38,10 @@
 		74A6EBF7F28FE70E7D81F11B /* Pods_ModelAPP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ModelAPP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8746B4629744F72B7DC6C02D /* Pods-ModelAPP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ModelAPP.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ModelAPP/Pods-ModelAPP.debug.xcconfig"; sourceTree = "<group>"; };
 		A080672721A3DBA8002B4BFB /* APIWrapperTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIWrapperTest.swift; sourceTree = "<group>"; };
+		D6067E31232137EC007FC65B /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
+		D6067E3323213810007FC65B /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		D6067E3723213C3F007FC65B /* LoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
+		D6067E3823213C3F007FC65B /* LoginController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginController.xib; sourceTree = "<group>"; };
 		D6333A6921A5759F00B05DB5 /* AccelerometerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccelerometerViewController.swift; sourceTree = "<group>"; };
 		D6333A6A21A5759F00B05DB5 /* AccelerometerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccelerometerViewController.xib; sourceTree = "<group>"; };
 		D6365F1A21AC03550010A5D3 /* CoreLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocationViewController.swift; sourceTree = "<group>"; };
@@ -76,6 +84,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D6067E302321105C007FC65B /* MVVM */ = {
+			isa = PBXGroup;
+			children = (
+				D6067E31232137EC007FC65B /* LoginModel.swift */,
+				D6067E3323213810007FC65B /* LoginViewModel.swift */,
+				D6067E3723213C3F007FC65B /* LoginController.swift */,
+				D6067E3823213C3F007FC65B /* LoginController.xib */,
+			);
+			path = MVVM;
+			sourceTree = "<group>";
+		};
 		D6333A6821A574A900B05DB5 /* Accelerometer */ = {
 			isa = PBXGroup;
 			children = (
@@ -99,6 +118,7 @@
 			children = (
 				D6C6838721A442220011A29E /* .swiftlint.yml */,
 				D66C09092190349C00FE11E5 /* ModelAPP */,
+				D6067E302321105C007FC65B /* MVVM */,
 				D66C68C721904F1B00033347 /* API Wrapper */,
 				D6333A6821A574A900B05DB5 /* Accelerometer */,
 				D6811F6421A6ABFB00EBBA89 /* Speedometer */,
@@ -154,8 +174,8 @@
 			children = (
 				D66C68CD219051C700033347 /* APIWrapperModel.swift */,
 				D66C68D121905D9E00033347 /* APIWrapperErrors.swift */,
-				D6A493A721CD1E6000667D8A /* README */,
 				D66C68CF219059AC00033347 /* APIWrapper.swift */,
+				D6A493A721CD1E6000667D8A /* README */,
 			);
 			path = "Wrapper Module";
 			sourceTree = "<group>";
@@ -243,6 +263,7 @@
 				D6A493A821CD1E6000667D8A /* README in Resources */,
 				D6365F1D21AC03550010A5D3 /* CoreLocationViewController.xib in Resources */,
 				D6C6838821A442220011A29E /* .swiftlint.yml in Resources */,
+				D6067E3A23213C3F007FC65B /* LoginController.xib in Resources */,
 				D66C0915219034B200FE11E5 /* LaunchScreen.storyboard in Resources */,
 				D66C0912219034B200FE11E5 /* Assets.xcassets in Resources */,
 				D66C68C921904F4B00033347 /* APIWraper.storyboard in Resources */,
@@ -349,10 +370,13 @@
 				D66C68CE219051C700033347 /* APIWrapperModel.swift in Sources */,
 				D66C68D0219059AC00033347 /* APIWrapper.swift in Sources */,
 				D6811F6721A6AC1B00EBBA89 /* SpeedometerViewController.swift in Sources */,
+				D6067E3923213C3F007FC65B /* LoginController.swift in Sources */,
+				D6067E32232137EC007FC65B /* LoginModel.swift in Sources */,
 				D6333A6B21A5759F00B05DB5 /* AccelerometerViewController.swift in Sources */,
 				D66C090D2190349C00FE11E5 /* ViewController.swift in Sources */,
 				D66C68CB21904FB300033347 /* RequestTypeViewController.swift in Sources */,
 				A080672821A3DBA8002B4BFB /* APIWrapperTest.swift in Sources */,
+				D6067E3423213810007FC65B /* LoginViewModel.swift in Sources */,
 				D66C090B2190349C00FE11E5 /* AppDelegate.swift in Sources */,
 				D66C68D221905D9E00033347 /* APIWrapperErrors.swift in Sources */,
 				D6365F1C21AC03550010A5D3 /* CoreLocationViewController.swift in Sources */,
